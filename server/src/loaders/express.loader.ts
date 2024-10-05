@@ -25,7 +25,7 @@ export default (app: express.Application) => {
 		res.header('preflightContinue', 'false');
 
 		if (req.method === 'OPTIONS') {
-			res.send(200);
+			res.sendStatus(200);
 		} else {
 			next();
 		}
@@ -59,10 +59,15 @@ export default (app: express.Application) => {
 		helmet(),
 		express.json({ limit: '5mb' }),
 		express.urlencoded({ extended: true }),
+		// express.static(path.join(process.cwd(), 'uploads'), staticOptions),
+	);
+
+	app.use(
+		'/uploads',
 		express.static(path.join(process.cwd(), 'uploads'), staticOptions),
 	);
 
-	app.use(apiRoute);
+	app.use('/api', apiRoute);
 
 	app.all('*', (req: Request, res: Response, next: NextFunction) => {
 		res.status(400).send('not found');

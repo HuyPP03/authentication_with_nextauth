@@ -8,9 +8,9 @@ export interface IUser {
 	avatar: string;
 	provider: 'credentials' | 'google' | 'facebook' | 'github';
 	role: 'admin' | 'user';
-	verified: boolean | null;
-	verificationCode: string | null;
-	expireAt: number | null;
+	verified: boolean;
+	verificationCode?: string;
+	expireAt?: number;
 	googleId: string;
 	facebookId: string;
 	githubId: string;

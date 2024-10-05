@@ -23,7 +23,7 @@ const userSchema = new Schema<IUser>(
 		verificationCode: {
 			type: String,
 			required: false,
-			default: null,
+			default: undefined,
 		},
 		expireAt: { type: Number, required: false },
 		googleId: { type: String, required: false },

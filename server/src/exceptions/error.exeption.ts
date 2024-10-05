@@ -13,12 +13,14 @@ export const handleError = (
 ) => {
 	console.error('error', error);
 	const responseData = {
-		code: error.statusCode || HttpStatusCode.InternalServerError,
-		message:
-			error.statusCode === HttpStatusCode.InternalServerError
-				? 'Internal Server Error'
-				: error.message,
+		meta: {
+			statusCode: error.statusCode || HttpStatusCode.InternalServerError,
+			message:
+				error.statusCode === HttpStatusCode.InternalServerError
+					? 'Internal Server Error'
+					: error.message,
+		},
 	};
 
-	return res.status(responseData.code).json(responseData);
+	return res.status(responseData.meta.statusCode).json(responseData);
 };

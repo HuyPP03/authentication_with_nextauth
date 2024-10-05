@@ -4,6 +4,7 @@ import "./globals.css";
 import SessionProvider from "./context/SessionProvider";
 import { getServerSession } from "next-auth";
 import Navbar from "./components/Navbar";
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,6 +33,7 @@ export default async function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <SessionProvider session={session}>
           <Navbar>{children}</Navbar>
+          <Toaster />
         </SessionProvider>
       </body>
     </html>

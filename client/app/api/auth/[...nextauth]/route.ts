@@ -5,6 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 import GitHubProvider from "next-auth/providers/github";
+import env from "@/env";
 
 export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET as string,
@@ -16,11 +17,27 @@ export const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials: any): Promise<any> {
-        const user = { id: "1", name: "J Smith", email: credentials.email };
+        const { email, password } = credentials;
+        const response = await fetch(`${env.app.server_url}/api/auth/login`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await response.json();
+        if (data.meta.statusCode !== 200) {
+          throw new Error(data.meta.message);
+        }
+        const user = data.data;
         if (user) {
-          return user;
+          if (user.verified) {
+            return user;
+          } else {
+            throw new Error("User not verified!");
+          }
         } else {
-          return null;
+          throw new Error("Invalid credentials!");
         }
       },
     }),
@@ -38,32 +55,45 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account }: any): Promise<any> {
+    async signIn({ user, account, profile }: any): Promise<any> {
+      const { email, id, image, name } = user;
       if (account?.provider === "credentials") {
         return true;
-      }
-      if (account?.provider === "google") {
-        try {
+      } else {
+        const response = await fetch(`${env.app.server_url}/api/auth/check`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: email }),
+        });
+        const data: any = await response.json();
+        const user = data.data;
+        if (user) {
+          if (user.provider !== account?.provider) return false;
           return true;
-        } catch (error) {
-          console.log(error);
-          return false;
-        }
-      }
-      if (account?.provider === "facebook") {
-        try {
+        } else {
+          const response = await fetch(
+            `${env.app.server_url}/api/auth/create-user-with-provider`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email: email,
+                provider: account?.provider,
+                providerId: id,
+                avatar: image,
+                username: name,
+              }),
+            }
+          );
+          const data = await response.json();
+          if (data.meta.statusCode !== 200) {
+            throw new Error(data.meta.message);
+          }
           return true;
-        } catch (error) {
-          console.log(error);
-          return false;
-        }
-      }
-      if (account?.provider === "github") {
-        try {
-          return true;
-        } catch (error) {
-          console.log(error);
-          return false;
         }
       }
     },

@@ -35,7 +35,7 @@ export function SignIn({ setAuthentication }: any) {
             "top-0 right-0 flex fixed md:max-w-[420px] md:top-4 md:right-4"
           ),
           variant: "destructive",
-          description: "Login failed!",
+          description: data.error,
           duration: 2000,
         });
         return;
@@ -54,14 +54,14 @@ export function SignIn({ setAuthentication }: any) {
           <div className="w-full flex justify-start gap-2 mb-4">
             <div
               onClick={() => setOpenSignInWithCredentials(false)}
-              className="cursor-pointer flex gap-2 font-semibold text-lg"
+              className="cursor-pointer flex gap-2 font-semibold text-lg items-center"
             >
               <Image
                 src={leftArrow.src}
                 alt="left arrow"
-                width={30}
-                height={10}
-                className="cursor-pointer"
+                width={12}
+                height={12}
+                className="cursor-pointer w-4 h-4"
               />
               <p>Quay lại</p>
             </div>
@@ -72,6 +72,7 @@ export function SignIn({ setAuthentication }: any) {
               name="email"
               type="email"
               className="w-full p-3 rounded-xl border"
+              placeholder="email..."
             />
           </label>
           <label className="flex flex-col gap-1 w-full">
@@ -80,6 +81,7 @@ export function SignIn({ setAuthentication }: any) {
               name="password"
               type="password"
               className="w-full p-3 rounded-xl border"
+              placeholder="password..."
             />
           </label>
           <Button
